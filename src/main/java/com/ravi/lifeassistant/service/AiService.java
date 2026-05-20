@@ -97,7 +97,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-@Service
+
 /*
 public class AiService {
 
@@ -148,6 +148,7 @@ public class AiService {
         }
     }
 }*/
+@Service
 public class AiService {
 
     @Value("${openai.api.url}")
@@ -155,6 +156,8 @@ public class AiService {
 
     @Value("${openai.model}")
     private String model;
+    @Value("${openai.api.key}")
+    private String apiKey;
 
     private final RestTemplate restTemplate;
 
@@ -164,6 +167,13 @@ public class AiService {
 
     public AiTaskResponse parseTextToTask(String userText) {
         // 1. ANCHOR THE DATE: Tell the AI today's date so it calculates "tomorrow" correctly
+        // DEBUG - remove after fixing
+        System.out.println(">>> API URL: " + apiUrl);
+        System.out.println(">>> API KEY: " + (apiKey != null ? apiKey.substring(0, 10) + "..." : "NULL"));
+        System.out.println(">>> MODEL: " + model);
+        
+        // ... rest of your code
+
         String today = java.time.LocalDate.now().toString(); 
         String systemPrompt = """
         	    Today is %s. 
@@ -194,7 +204,8 @@ public class AiService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth("ollama");
+        //headers.setBearerAuth("ollama");
+        headers.setBearerAuth(apiKey);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
 
